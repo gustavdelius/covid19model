@@ -48,7 +48,6 @@ transformed parameters {
             h[i] = fir[m] * (F[i] - F[i-1]) / (1 - fir[m] * F[i]);
             s[i] = s[i-1] * (1 - h[i-1]);
             f[i, m] = s[i] * h[i];
-            tc[i, m] = tc[i-1, m] + prediction[i-1, m];
         }
         prediction[1:N0,m] = rep_vector(y[m],N0); // learn the number of cases in the first N0 days
         Rt[,m] = mu[m] * exp(covariate1[,m] * (-alpha[1]) + covariate2[,m] * (-alpha[2]) +
@@ -59,6 +58,7 @@ transformed parameters {
             for(j in 1:(i-1)) {
                 convolution += prediction[j, m]*SI[i-j]; // Correctd 22nd March
             }
+            tc[i, m] = tc[i-1, m] + prediction[i-1, m];
             prediction[i, m] = Rt[i,m] * convolution * (1 - tc[i, m] / Pop[m]);
         }
       
