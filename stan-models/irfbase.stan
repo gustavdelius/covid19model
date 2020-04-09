@@ -25,12 +25,12 @@ parameters {
   vector<lower=0>[M] y_raw;
   real<lower=0> phi;
   real<lower=0> tau;
-  vector<lower=1, upper=9>[M] ifr_log; // log10 of infection-fatality ratio
+  real<lower=0, upper=7> ifr_log; // log10 of infection-fatality ratio
 }
 
 transformed parameters {
     vector<lower = 0>[M] y = tau * y_raw ;
-    vector<upper = 1>[M] fir = rep_vector(0, M);
+    real<upper = 1> fir = 10^(-ifr_log);
     matrix[N2, M] f = rep_matrix(0,N2,M);
     matrix[N2, M] tc = rep_matrix(0,N2,M);
     matrix[N2, M] prediction = rep_matrix(0,N2,M);
@@ -39,13 +39,12 @@ transformed parameters {
     for (m in 1:M) {
         vector[N2] h = rep_vector(1, N2);
         vector[N2] s = rep_vector(1, N2);
-        fir[m] = 10^(-ifr_log[m]);
-        y[m] = tau * y_raw[m] / fir[m];
-        h[1] = fir[m] * F[1];
+        y[m] = tau * y_raw[m] / fir;
+        h[1] = fir * F[1];
         s[1] = 1;
         f[1, m] = h[1];
         for(i in 2:N2) {
-            h[i] = fir[m] * (F[i] - F[i-1]) / (1 - fir[m] * F[i]);
+            h[i] = fir * (F[i] - F[i-1]) / (1 - fir * F[i]);
             s[i] = s[i-1] * (1 - h[i-1]);
             f[i, m] = s[i] * h[i];
         }
