@@ -57,11 +57,11 @@ if (Sys.getenv("DEBUG") == "TRUE") {
 }
 
 if(DEBUG == FALSE) {
-  N2 = 75 # Increase this for a further forecast
+  N2 = 100 # Increase this for a further forecast
 }  else  {
   ### For faster runs:
   # countries = c("Austria","Belgium") #,Spain")
-  N2 = 75
+  N2 = 100
 }
 # countries = c("Italy","United_Kingdom","Spain","Norway","Austria","Switzerland")
 
