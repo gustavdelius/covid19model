@@ -192,7 +192,7 @@ if(DEBUG) {
   fit = sampling(m,data=stan_data,iter=40,warmup=20,chains=2)
 } else {
   # fit = sampling(m,data=stan_data,iter=4000,warmup=2000,chains=8,thin=4,control = list(adapt_delta = 0.90, max_treedepth = 10))
-  fit = sampling(m,data=stan_data,iter=4000,warmup=2000,chains=4,thin=4,control = list(adapt_delta = 0.90, max_treedepth = 10))
+  fit = sampling(m,data=stan_data,iter=8000,warmup=4000,chains=4,thin=4,control = list(adapt_delta = 0.90, max_treedepth = 10))
 }  
 
 out = rstan::extract(fit)
@@ -205,39 +205,4 @@ if(JOBID == "")
   JOBID = as.character(abs(round(rnorm(1) * 1000000)))
 print(sprintf("Jobid = %s",JOBID))
 
-save.image(paste0('results/',StanModel,'-',JOBID,'.Rdata'))
-
-save(fit,prediction,dates,reported_cases,deaths_by_country,countries,estimated.deaths,estimated.deaths.cf,out,covariates,file=paste0('results/',StanModel,'-',JOBID,'-stanfit.Rdata'))
-
-# to visualize results
-library(bayesplot)
-filename <- paste0('base-',JOBID)
-plot_labels <- c("School Closure",
-                 "Self Isolation",
-                 "Public Events",
-                 "First Intervention",
-                 "Lockdown", 'Social distancing')
-
-
-ifr_log = (as.matrix(out$ifr_log))
-colnames(ifr_log) = countries
-g = (mcmc_intervals(ifr_log,prob = .9))
-g
-
-alpha = (as.matrix(out$alpha))
-colnames(alpha) = plot_labels
-g = (mcmc_intervals(alpha, prob = .9))
-ggsave(sprintf("results/%s-covars-alpha-log.pdf",filename),g,width=4,height=6)
-g = (mcmc_intervals(alpha, prob = .9,transformations = function(x) exp(-x)))
-ggsave(sprintf("results/%s-covars-alpha.pdf",filename),g,width=4,height=6)
-mu = (as.matrix(out$mu))
-colnames(mu) = countries
-g = (mcmc_intervals(mu,prob = .9))
-ggsave(sprintf("results/%s-covars-mu.pdf",filename),g,width=4,height=6)
-dimensions <- dim(out$Rt)
-Rt = (as.matrix(out$Rt[,dimensions[2],]))
-colnames(Rt) = countries
-g = (mcmc_intervals(Rt,prob = .9))
-ggsave(sprintf("results/%s-covars-final-rt.pdf",filename),g,width=4,height=6)
-system(paste0("Rscript plot-3-panel.r ", filename,'.Rdata'))
-system(paste0("Rscript plot-forecast.r ",filename,'.Rdata')) ## to run this code you will need to adjust manual values of forecast required
+save(fit,file=paste0('results/',StanModel,'-',JOBID,'-stanfit.Rdata'))
