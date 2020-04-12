@@ -21,9 +21,9 @@ parameters {
   real<lower=0> mu[M]; // intercept for Rt
   real<lower=0> alpha_hier[6]; // sudo parameter for the hier term for alpha
   real<lower=0> kappa;
-  real<lower=0> y[M];
+  real<lower=0> y_raw[M];
   real<lower=0> phi;
-  real<lower=0> tau;
+  real<lower=0> tau_unit;
   real <lower=0> ifr_noise[M];
   real<lower=-2,upper=2> log_ifr_mean;
 }
@@ -34,6 +34,10 @@ transformed parameters {
     matrix[N2, M] E_deaths  = rep_matrix(0,N2,M);
     matrix[N2, M] Rt = rep_matrix(0,N2,M);
     matrix[N2, M] Rt_adj = Rt;
+    real y[M];
+    
+    real ifr_mean = 10^log_ifr_mean;
+    real<lower = 0> tau = tau_unit / 0.03 * ifr_mean;
     
     {
       matrix[N2,M] cumm_sum = rep_matrix(0,N2,M);
@@ -41,6 +45,7 @@ transformed parameters {
         alpha[i] = alpha_hier[i] - ( log(1.05) / 6.0 );
       }
       for (m in 1:M){
+        y[m] = tau * y_raw[m];
         for (i in 2:N0){
           cumm_sum[i,m] = cumm_sum[i-1,m] + y[m]; 
         }
@@ -63,23 +68,23 @@ transformed parameters {
         E_deaths[1, m]= 1e-15 * prediction[1,m];
         for (i in 2:N2){
           for(j in 1:(i-1)){
-            E_deaths[i,m] += prediction[j,m] * f[i-j,m] * ifr_noise[m];
+            E_deaths[i,m] += prediction[j,m] * f[i-j,m] * 
+              (ifr_noise[m] * 0.1 + 1) / ifr_mean ;
           }
         }
       }
     }
 }
 model {
-  real ifr_mean = 10^log_ifr_mean;
-  tau ~ exponential(0.03/ifr_mean);
+  tau_unit ~ exponential(1);
   for (m in 1:M){
-      y[m] ~ exponential(1/tau);
+      y_raw[m] ~ exponential(1);
   }
   phi ~ normal(0,5);
   kappa ~ normal(0,0.5);
   mu ~ normal(3.28, kappa); // citation: https://academic.oup.com/jtm/article/27/2/taaa021/5735319
   alpha_hier ~ gamma(.1667,1);
-  ifr_noise ~ normal(ifr_mean, 0.1 * ifr_mean);
+  ifr_noise ~ std_normal();
   for(m in 1:M){
     deaths[EpidemicStart[m]:N[m], m] ~ neg_binomial_2(E_deaths[EpidemicStart[m]:N[m], m], phi);
    }
