@@ -22,7 +22,7 @@ parameters {
   real<lower=0> y_raw[M];
   real<lower=0> phi;
   real<lower=0> tau_unit;
-  real<lower=0,upper=7> log_ifr_mean;
+  real<lower=0,upper=3> log_ifr_mean;
   real ifr_std[M];
   real<lower=2,upper=20> mu_mean;
   real mu_std[M];
@@ -48,7 +48,7 @@ transformed parameters {
       for (m in 1:M){
         y[m] = tau * y_raw[m];
         ifr[m] = exp(ifr_std[m] * 0.1) * ifr_mean;
-        mu[M] = exp(mu_std[m] * 0.1) * mu_mean;
+        mu[m] = exp(mu_std[m] * 0.1) * mu_mean;
         for (i in 2:N0){
           cumm_sum[i,m] = cumm_sum[i-1,m] + y[m]; 
         }
@@ -78,9 +78,7 @@ transformed parameters {
 }
 model {
   tau_unit ~ exponential(1);
-  for (m in 1:M){
-      y_raw[m] ~ exponential(1);
-  }
+  y_raw ~ exponential(1);
   ifr_std ~ std_normal();
   mu_std ~ std_normal();
   phi ~ normal(0,5);
@@ -113,10 +111,9 @@ generated quantities {
         E_deaths0[1, m] = uniform_rng(1e-16, 1e-15);
         for (i in 2:N2){
           for(j in 1:(i-1)){
-            E_deaths0[i,m] += prediction0[j,m] * f[i-j,m] / ifr_mean;
+            E_deaths0[i,m] += prediction0[j,m] * f[i-j,m] / ifr[m];
           }
         }
       }
     }
 }
-
