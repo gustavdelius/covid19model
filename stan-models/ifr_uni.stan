@@ -30,10 +30,10 @@ parameters {
 
 transformed parameters {
     real alpha[6];
-    matrix[N2, M] prediction = rep_matrix(0,N2,M);
-    matrix[N2, M] E_deaths  = rep_matrix(0,N2,M);
-    matrix[N2, M] Rt = rep_matrix(0,N2,M);
-    real y[M];
+    matrix<lower=0>[N2, M] prediction = rep_matrix(0,N2,M);
+    matrix<lower=0>[N2, M] E_deaths  = rep_matrix(0,N2,M);
+    matrix<lower=0>[N2, M] Rt = rep_matrix(0,N2,M);
+    real<lower=0> y[M];
     real ifr[M];
     real mu[M];
     
