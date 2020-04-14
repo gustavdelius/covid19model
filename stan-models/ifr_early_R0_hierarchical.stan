@@ -5,7 +5,7 @@ data {
   int<lower=1> N2; // days of observed data + # of days to forecast
   int cases[N2,M]; // reported cases
   int deaths[N2, M]; // reported deaths -- the rows with i > N contain -1 and should be ignored
-  matrix[N2, M] f; // h * s
+  matrix[N2, M] f; // h * s * ifr
   matrix[N2, M] covariate1;
   matrix[N2, M] covariate2;
   matrix[N2, M] covariate3;
@@ -39,8 +39,7 @@ transformed parameters {
     
     real ifr_mean = 10^log_ifr_mean;
     real<lower = 0> tau = tau_unit / 0.03 * ifr_mean;
-    
-    {
+
       matrix[N2,M] cumm_sum = rep_matrix(0,N2,M);
       for(i in 1:6){
         alpha[i] = alpha_hier[i] - ( log(1.05) / 6.0 );
@@ -74,7 +73,6 @@ transformed parameters {
           }
         }
       }
-    }
 }
 model {
   tau_unit ~ exponential(1);
@@ -91,6 +89,7 @@ model {
 generated quantities {
     matrix[N2, M] prediction0 = rep_matrix(0,N2,M);
     matrix[N2, M] E_deaths0  = rep_matrix(0,N2,M);
+    matrix[N2, M] Rt_adj = Rt;
     
     {
       matrix[N2,M] cumm_sum0 = rep_matrix(0,N2,M);
@@ -106,6 +105,8 @@ generated quantities {
           }
           cumm_sum0[i,m] = cumm_sum0[i-1,m] + prediction0[i-1,m];
           prediction0[i, m] =  ((pop[m]-cumm_sum0[i,m]) / pop[m]) * mu[m] * convolution0;
+          
+          Rt_adj[i,m] = ((pop[m]-cumm_sum[i,m]) / pop[m]) * Rt[i,m];
         }
         
         E_deaths0[1, m] = uniform_rng(1e-16, 1e-15);

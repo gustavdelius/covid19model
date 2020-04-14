@@ -39,7 +39,6 @@ transformed parameters {
     
     real<lower = 0> tau = tau_unit / 0.03 * ifr_mean;
     
-    {
       matrix[N2,M] cumm_sum = rep_matrix(0,N2,M);
       for(i in 1:6){
         alpha[i] = alpha_hier[i] - ( log(1.05) / 6.0 );
@@ -72,7 +71,6 @@ transformed parameters {
             E_deaths[i,m] += prediction[j,m] * f[i-j,m] / ifr[m] ;
           }
         }
-      }
     }
 }
 model {
@@ -90,6 +88,7 @@ model {
 generated quantities {
     matrix[N2, M] prediction0 = rep_matrix(0,N2,M);
     matrix[N2, M] E_deaths0  = rep_matrix(0,N2,M);
+    matrix[N2, M] Rt_adj = Rt;
     
     {
       matrix[N2,M] cumm_sum0 = rep_matrix(0,N2,M);
@@ -105,6 +104,8 @@ generated quantities {
           }
           cumm_sum0[i,m] = cumm_sum0[i-1,m] + prediction0[i-1,m];
           prediction0[i, m] =  ((pop[m]-cumm_sum0[i,m]) / pop[m]) * mu[m] * convolution0;
+          
+          Rt_adj[i,m] = ((pop[m]-cumm_sum[i,m]) / pop[m]) * Rt[i,m];
         }
         
         E_deaths0[1, m] = uniform_rng(1e-16, 1e-15);
