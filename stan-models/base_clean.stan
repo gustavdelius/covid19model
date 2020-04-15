@@ -84,7 +84,6 @@ transformed parameters {
         }
       }
     }
-      print(E_deaths);
   }
 }
 
