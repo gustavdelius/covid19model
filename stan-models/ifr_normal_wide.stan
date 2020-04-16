@@ -28,7 +28,7 @@ parameters {
   real log_ifr_factor;
   // R0 before interventions
   vector[M] mu_std;
-  real log_mu_mean;
+  real log_mu_factor;
   // covariate coefficients
   vector<lower = 0>[6] alpha_hier; // sudo parameter for the hier term for alpha
   // seed infections
@@ -48,7 +48,7 @@ transformed parameters {
                            + covariate5 * alpha[5]
                            + covariate6 * alpha[6]));
   vector<lower = 0>[M] ifr = exp(ifr_std * 0.2 + log_ifr_factor);
-  real<lower = 0> tau = tau_unit / 0.03 * ifr;
+  real<lower = 0> tau = tau_unit / 0.03 * exp(log_ifr_factor);
   vector<lower = 0>[M] y = tau * y_unit; // y ~ exponential(1/tau)
   vector<lower = 0>[M] mu = exp(mu_std * 0.2 + log_mu_factor) * 3.28;
   matrix[N2, M] cumm_sum = matrix_0; // total number of immune individuals
@@ -90,7 +90,7 @@ model {
   y_unit ~ exponential(1);
   ifr_std ~ std_normal();
   log_ifr_factor ~ normal(0, 3);
-  log_mu_mean ~ normal(0, 1);
+  log_mu_factor ~ normal(0, 1);
   mu_std ~ std_normal();
   alpha_hier ~ gamma(.1667, 1);
   phi ~ normal(0, 5);
