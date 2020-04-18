@@ -19,7 +19,6 @@ data {
 
 transformed data {
   matrix[N2, M] matrix_0 = rep_matrix(0, N2, M);
-  matrix[N2, M] matrix_1 = rep_matrix(1, N2, M);
   real log_infecteds_multiplier = 2; // We will _divide_ ifr by exp(log_infecteds_multiplier)
 }
 
@@ -37,12 +36,12 @@ parameters {
   vector<lower = 0>[M] y_unit; // distribution of initial number of infecteds
   real<lower = 0> tau_unit; // hyperparamter for initial number of infecteds
   // initial susceptibility
-  real<lower = 0, upper = 1> sus;
+  real<lower = 0, upper = 1> sus_initial;
 }
 
 transformed parameters {
   vector[6] alpha = alpha_hier - (log(1.05) / 6.0); // coefficients of covariates
-  matrix[N2, M] prediction = matrix_0; // predicted number of daily infections
+  matrix<lower = 0>[N2, M] prediction = matrix_0; // predicted number of daily infections
   matrix[N2, M] E_deaths = matrix_0; // predicted number of daily deaths
   // R0 with interventions (will be rescaled by initial R0 later)
   matrix[N2, M] Rt = exp(-(covariate1 * alpha[1]
@@ -58,13 +57,13 @@ transformed parameters {
   // hence tau ~ exponential(0.03) * infecteds_multiplier
   real<lower = 0> tau = tau_unit / 0.03 * exp(log_infecteds_multiplier); 
   vector<lower = 0>[M] y = tau * y_unit; // y ~ exponential(1/tau)
-  matrix[N2, M] susceptible = sus * matrix_1; // proportion of susceptibles in population
+  matrix<lower = 0>[N2, M] susceptible = rep_matrix(sus_initial, N2, M); // proportion of susceptibles in population
   
   for (m in 1:M) {
     prediction[1, m] = y[m];
     for (i in 2:N0) {
       prediction[i, m] = y[m]; // keeping same number of cases in the first N0 days
-      susceptible[i, m] = susceptible[i-1, m] - y[m] / N[m];
+      susceptible[i, m] = susceptible[i-1, m] - y[m] / pop[m];
     }
     Rt[, m] *= mu[m];
     
@@ -73,7 +72,7 @@ transformed parameters {
       for(j in 1:(i-1)) {
         convolution += Rt[j, m] * prediction[j, m] * SI[i-j];
       }
-      susceptible[i, m] = susceptible[i-1, m] - prediction[i-1, m] / N[m];
+      susceptible[i, m] = susceptible[i-1, m] - prediction[i-1, m] / pop[m];
       prediction[i, m] = susceptible[i, m] * convolution;
     }
     E_deaths[1, m]= 1e-15 * prediction[1, m]; // zero really
@@ -108,13 +107,13 @@ generated quantities {
   matrix[N2, M] Rt_adj = Rt .* susceptible; // Effective R including immunity
   
   {
-    matrix[N2, M] susceptible0 = matrix_1; // proportion of susceptibles in population
+    matrix[N2, M] susceptible0 = rep_matrix(sus_initial, N2, M); // proportion of susceptibles in population
     
     for (m in 1:M) {
       prediction0[1, m] = y[m];
       for (i in 2:N0) {
         prediction0[i, m] = y[m]; // keeping same number of cases in the first N0 days
-        susceptible0[i, m] = susceptible0[i-1, m] - y[m] / N[m];
+        susceptible0[i, m] = susceptible0[i-1, m] - y[m] / pop[m];
       }
       
       for (i in (N0 + 1):N2) {
@@ -122,7 +121,7 @@ generated quantities {
         for(j in 1:(i-1)) {
           convolution += mu[m] * prediction0[j, m] * SI[i-j];
         }
-        susceptible0[i, m] = susceptible0[i-1, m] - prediction0[i-1, m] / N[m];
+        susceptible0[i, m] = susceptible0[i-1, m] - prediction0[i-1, m] / pop[m];
         prediction0[i, m] = susceptible0[i, m] * convolution;
       }
       
@@ -135,4 +134,3 @@ generated quantities {
     }
   }
 }
-
