@@ -54,7 +54,7 @@ transformed parameters {
   // hence tau ~ exponential(0.03) * infecteds_multiplier
   real<lower = 0> tau = tau_unit / 0.03 * exp(log_infecteds_multiplier); 
   vector<lower = 0>[M] y = tau * y_unit; // y ~ exponential(1/tau)
-  matrix[N2, M] susceptible = matrix_1; // proportion of susceptibles in population
+  matrix<lower = 0>[N2, M] susceptible = matrix_1; // proportion of susceptibles in population
   
   for (m in 1:M) {
     prediction[1, m] = y[m];
