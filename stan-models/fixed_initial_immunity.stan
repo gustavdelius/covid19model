@@ -38,7 +38,7 @@ parameters {
 }
 
 transformed parameters {
-  vector[6] alpha = alpha_hier + (log(1.05) / 6.0); // coefficients of covariates
+  vector[6] alpha = alpha_hier - (log(1.05) / 6.0); // coefficients of covariates
   matrix[N2, M] prediction = matrix_0; // predicted number of daily infections
   matrix[N2, M] E_deaths = matrix_0; // predicted number of daily deaths
   // R0 with interventions (will be rescaled by initial R0 later)

@@ -38,7 +38,7 @@ parameters {
 }
 
 transformed parameters {
-  vector[6] alpha = alpha_hier + (log(1.05) / 6.0); // coefficients of covariates
+  vector[6] alpha = alpha_hier - (log(1.05) / 6.0); // coefficients of covariates
   matrix[N2, M] prediction = matrix_0; // predicted number of daily infections
   matrix[N2, M] E_deaths = matrix_0; // predicted number of daily deaths
   // R0 with interventions (will be rescaled by initial R0 later)
@@ -94,7 +94,7 @@ transformed parameters {
 model {
   tau_unit ~ exponential(1); // tau ~ exponential(0.03)
   y_unit ~ exponential(1); // y ~ exponential(1/tau)
-  kappa ~ normal(0 ,0.5);
+  kappa ~ normal(0, 0.5);
   mu ~ normal(3.28, kappa); // citation: https://academic.oup.com/jtm/article/27/2/taaa021/5735319
   log_mu_factor ~ std_normal();
   alpha_hier ~ gamma(.1667, 1);
