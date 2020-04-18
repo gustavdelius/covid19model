@@ -191,7 +191,7 @@ if(DEBUG) {
 } else if (FULL) {
   fit = sampling(m,data=stan_data,iter=4000,warmup=2000,chains=4,thin=4,control = list(adapt_delta = 0.95, max_treedepth = 10))
 } else { 
-  fit = sampling(m,data=stan_data,iter=200,warmup=100,chains=4,thin=4,control = list(adapt_delta = 0.95, max_treedepth = 10))
+  fit = sampling(m,data=stan_data,iter=800,warmup=400,chains=4,thin=4,control = list(adapt_delta = 0.95, max_treedepth = 10))
 }
 
 JOBID = Sys.getenv("PBS_JOBID")
