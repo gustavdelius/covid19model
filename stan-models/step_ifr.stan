@@ -60,7 +60,7 @@ transformed parameters {
     prediction[1, m] = y[m];
     for (i in 2:N0) {
       prediction[i, m] = y[m]; // keeping same number of cases in the first N0 days
-      susceptible[i, m] = susceptible[i-1, m] - y[m] / N[m];
+      susceptible[i, m] = susceptible[i-1, m] - y[m] / pop[m];
     }
     Rt[, m] *= mu[m];
     
@@ -110,7 +110,7 @@ generated quantities {
       prediction0[1, m] = y[m];
       for (i in 2:N0) {
         prediction0[i, m] = y[m]; // keeping same number of cases in the first N0 days
-        susceptible0[i, m] = susceptible0[i-1, m] - y[m] / N[m];
+        susceptible0[i, m] = susceptible0[i-1, m] - y[m] / pop[m];
       }
       
       for (i in (N0 + 1):N2) {
