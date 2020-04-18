@@ -69,7 +69,7 @@ transformed parameters {
       for(j in 1:(i-1)) {
         convolution += prediction[j, m] * SI[i-j];
       }
-      susceptible[i, m] = susceptible[i-1, m] - prediction[i-1, m] / N[m];
+      susceptible[i, m] = susceptible[i-1, m] - prediction[i-1, m] / pop[m];
       prediction[i, m] = susceptible[i, m] * Rt[i, m] * convolution;
     }
     E_deaths[1, m]= 1e-15 * prediction[1, m]; // zero really
@@ -118,7 +118,7 @@ generated quantities {
         for(j in 1:(i-1)) {
           convolution += mu[m] * prediction0[j, m] * SI[i-j];
         }
-        susceptible0[i, m] = susceptible0[i-1, m] - prediction0[i-1, m] / N[m];
+        susceptible0[i, m] = susceptible0[i-1, m] - prediction0[i-1, m] / pop[m];
         prediction0[i, m] = susceptible0[i, m] * convolution;
       }
       
