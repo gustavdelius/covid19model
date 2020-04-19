@@ -225,4 +225,3 @@ system(paste0("Rscript make-table.r ",filename,'-stanfit.Rdata'))
 # if(verify_result != 0){
 #   stop("Verification of web output failed!")
 # }
-# system("Rscript web-fix-fonts.r")
