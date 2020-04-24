@@ -90,8 +90,9 @@ if(JOBID == "")
 print(sprintf("Jobid = %s",JOBID))
 
 countries <- countries$Regions
-save.image(paste0('results/',StanModel,'-',JOBID,'.Rdata'))
-save(fit,prediction,dates,reported_cases,deaths_by_country,countries,estimated.deaths,estimated.deaths.cf,out,file=paste0('results/',StanModel,'-',JOBID,'-stanfit.Rdata'))
+save(fit, dates, reported_cases, deaths_by_country, countries, covariates,
+     stan_data,
+     file = paste0('results/',StanModel,'-',JOBID,'-stanfit.Rdata'))
 
 ## Ensure that output directories exist
 dir.create("results/", showWarnings = FALSE, recursive = TRUE)
@@ -137,7 +138,7 @@ if(make_table_error != 0){
 }
 
 
-verify_result_error <- system(paste0("Rscript web-verify-output.r ", filename,'.Rdata'),intern=FALSE)
-if(verify_result_error != 0){
-  stop(sprintf("Verification of web output failed! Code: %d", verify_result_error))
-}
+# verify_result_error <- system(paste0("Rscript web-verify-output.r ", filename,'.Rdata'),intern=FALSE)
+# if(verify_result_error != 0){
+#   stop(sprintf("Verification of web output failed! Code: %d", verify_result_error))
+# }
