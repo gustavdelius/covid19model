@@ -33,7 +33,7 @@ for(i in 1:length(countries)) {
   Country = countries[i]
   x = dates[[i]]
   N = length(x)
-  forecast = 7
+  forecast = 2
   x  = c(x,x[length(x)]+1:forecast)
   padding <- len_dates - length(dates[[i]])
   y[[i]] = c(rep(0, padding),reported_cases[[i]], rep(NA, forecast))
