@@ -90,7 +90,7 @@ if(JOBID == "")
 print(sprintf("Jobid = %s",JOBID))
 
 countries <- countries$Regions
-save(fit, dates, countries, stan_data,
+save(fit, dates, reported_cases, deaths_by_country, countries, stan_data, 
      file = paste0('results/',StanModel,'-',JOBID,'-stanfit.Rdata'))
 
 ## Ensure that output directories exist

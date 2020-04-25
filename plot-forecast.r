@@ -20,7 +20,8 @@ make_forecast_plot <- function(){
   args <- commandArgs(trailingOnly = TRUE)
   filename <- args[1]
   
-  load(paste0("results/", filename))out = rstan::extract(fit)
+  load(paste0("results/", filename))
+  out = rstan::extract(fit)
   prediction = out$prediction
   estimated.deaths = out$E_deaths
   estimated.deaths.cf = out$E_deaths0
