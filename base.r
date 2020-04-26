@@ -16,6 +16,8 @@ parser <- add_option(parser, c("-D", "--debug"), action="store_true",
                      help="Perform a debug run of the model")
 parser <- add_option(parser, c("-F", "--full"), action="store_true",
                      help="Perform a full run of the model")
+parser <- add_option(parser, c("-L", "--long"), action="store_true",
+                     help="Perform a long run of the model")
 cmdoptions <- parse_args(parser, args = commandArgs(trailingOnly = TRUE), positional_arguments = TRUE)
 
 # Default run parameters for the model
@@ -46,6 +48,8 @@ if(DEBUG) {
   print("Running in DEBUG mode")
 } else if (FULL) {
   print("Running in FULL mode")
+} else if (LONG) {
+  print("Running in LONG mode")
 }
 
 # Read which countires to use
@@ -75,6 +79,8 @@ if(DEBUG) {
   fit = sampling(m,data=stan_data,iter=40,warmup=20,chains=2)
 } else if (FULL) {
   fit = sampling(m,data=stan_data,iter=1800,warmup=1000,chains=5,thin=1,control = list(adapt_delta = 0.95, max_treedepth = 15))
+} else if (LONG) {
+  fit = sampling(m,data=stan_data,iter=2800,warmup=1800,chains=8,thin=1,control = list(adapt_delta = 0.95, max_treedepth = 15))
 } else { 
   fit = sampling(m,data=stan_data,iter=1000,warmup=500,chains=4,thin=1,control = list(adapt_delta = 0.95, max_treedepth = 10))
 }   
