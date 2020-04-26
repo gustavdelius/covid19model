@@ -1,6 +1,6 @@
 functions {
-  real b(real x, real d, real beta) {
-    real y = 1 + exp((d - x) / 6);
+  real b(real x, real d, real beta, real loc, real shape) {
+    real y = 1 + exp((d - x) / shape);
     return (y - beta) / y;
   }
 }
@@ -31,7 +31,7 @@ transformed data {
     
   for(m in 1:M){
     for(i in 1:N2) {
-      d[m] = 35 - max(N) + N[m];
+      d[m] = -max(N) + N[m];
       f_rev[m, i] = f[N2-i+1,m];
     }
   }
@@ -50,6 +50,8 @@ parameters {
   vector<lower=0>[M] ifr_noise;
   real log_infecteds_multiplier; // We will _divide_ ifr by exp(log_infecteds_multiplier)
   real<lower=0> behaviour;
+  real<lower = 3, upper = 15> shape;
+  real<lower = 20, upper = 50> loc;
 }
 
 transformed parameters {
@@ -78,7 +80,7 @@ transformed parameters {
         for (i in (N0+1):N2) {
           real convolution = dot_product(sub_col(prediction, 1, m, i-1), tail(SI_rev, i-1));
           cumm_sum[i,m] = cumm_sum[i-1,m] + prediction[i-1,m];
-          Rt[i, m] *= b(i, d[m], behaviour);
+          Rt[i, m] *= b(i, d[m], behaviour, loc, shape);
           Rt_adj[i,m] = ((pop[m]-cumm_sum[i,m]) / pop[m]) * Rt[i,m];
           prediction[i, m] = Rt_adj[i,m] * convolution;
         }
