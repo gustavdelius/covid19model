@@ -40,7 +40,7 @@ parameters {
   real<lower=0> tau_unit;
   vector<lower=0>[M] ifr_noise;
   real log_infecteds_multiplier; // We will _divide_ ifr by exp(log_infecteds_multiplier)
-  real <lower = 0, upper = 0.6> u; // Proportion of population that is isolated after lockdown
+  real <lower = 0, upper = 1> u; // Proportion of population that is isolated after lockdown
 }
 
 transformed parameters {
