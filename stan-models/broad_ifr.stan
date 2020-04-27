@@ -30,7 +30,7 @@ transformed data {
 
 parameters {
   real<lower=0> mu[M]; // intercept for Rt
-  real<lower=0> alpha[P]; 
+  vector[P] alpha; 
   real<lower=0> gamma;
   vector[M] lockdown;
   real<lower=0> kappa;
@@ -42,7 +42,6 @@ parameters {
 }
 
 transformed parameters {
-    vector[P] alpha;
     matrix[N2, M] prediction = rep_matrix(0,N2,M);
     matrix[N2, M] E_deaths  = rep_matrix(0,N2,M);
     matrix[N2, M] Rt = rep_matrix(0,N2,M);
