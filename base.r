@@ -36,7 +36,7 @@ if(is.null(cmdoptions$options$full)) {
 if(is.null(cmdoptions$options$long)) {
   LONG = Sys.getenv("LONG") == "TRUE"
 } else {
-  LONG = cmdoptions$options$full
+  LONG = cmdoptions$options$long
 }
 
 if(DEBUG && FULL) {
