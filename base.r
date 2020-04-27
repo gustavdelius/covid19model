@@ -33,6 +33,12 @@ if(is.null(cmdoptions$options$full)) {
   FULL = cmdoptions$options$full
 }
 
+if(is.null(cmdoptions$options$long)) {
+  LONG = Sys.getenv("LONG") == "TRUE"
+} else {
+  LONG = cmdoptions$options$full
+}
+
 if(DEBUG && FULL) {
   stop("Setting both debug and full run modes at once is invalid")
 }
