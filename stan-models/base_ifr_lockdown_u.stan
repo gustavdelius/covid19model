@@ -57,19 +57,22 @@ transformed parameters {
     
     {
       matrix[N2,M] cumm_sum = zero_matrix;
+      matrix[N2,M] cumm_sum_lockdown = zero_matrix;
       for(i in 1:P){
         alpha[i] = alpha_hier[i] - ( log(1.05) / 6.0 );
       }
       for (m in 1:M){
         prediction[1:N0,m] = rep_vector(y[m],N0); // learn the number of cases in the first N0 days
         cumm_sum[2:N0,m] = cumulative_sum(prediction[2:N0,m]);
+        cumm_sum_lockdown[2:N0, m] = cumm_sum[2:N0, m];
         
         Rt[,m] = mu[m] * exp(-X[m] * alpha - X[m][,5] * lockdown[m]);
         Rt_adj[1:N0,m] = Rt[1:N0,m];
         for (i in (N0+1):N2) {
           real convolution = dot_product(sub_col(prediction, 1, m, i-1), tail(SI_rev, i-1));
           cumm_sum[i,m] = cumm_sum[i-1,m] + prediction[i-1,m];
-          Rt_adj[i,m] = (((1 - u * X[m][i, 5]) * pop[m] - cumm_sum[i,m]) / pop[m]) * Rt[i,m];
+          cumm_sum_lockdown[i,m] = cumm_sum[i-1,m] + prediction[i-1,m] * (1 - X[m][i, 5]);
+          Rt_adj[i,m] = ((pop[m] - u * (pop[m] - cumm_sum_lockdown[i, m]) * X[m][i, 5] - cumm_sum[i,m]) / pop[m]) * Rt[i,m];
           prediction[i, m] = Rt_adj[i,m] * convolution;
         }
         E_deaths[1, m]= 1e-15 * prediction[1,m];
