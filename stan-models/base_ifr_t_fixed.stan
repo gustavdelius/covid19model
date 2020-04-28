@@ -39,7 +39,6 @@ parameters {
   real<lower=0> tau_unit;
   vector<lower=0>[M] ifr_noise;
   real log_infecteds_multiplier; // We will _divide_ ifr by exp(log_infecteds_multiplier)
-  real<upper=0.5> r; // Factor by which the ifr reduces over N2 days.
 }
 
 transformed parameters {
@@ -76,7 +75,7 @@ transformed parameters {
         time_factor = 1;
         for (i in 2:N2){
           E_deaths[i,m] = ifr_factor[m] * time_factor * dot_product(sub_col(prediction, 1, m, i-1), tail(f_rev[m], i-1));
-          time_factor -= inv(N2) * r;
+          time_factor -= inv(N2) * 0.5;
         }
       }
     }
@@ -94,7 +93,6 @@ model {
   alpha_hier ~ gamma(.1667,1);
   ifr_noise ~ normal(1,0.1);
   log_infecteds_multiplier ~ normal(0, 2);
-  r ~ normal(0.1, 0.2);
   for(m in 1:M){
     deaths[EpidemicStart[m]:N[m], m] ~ neg_binomial_2(E_deaths[EpidemicStart[m]:N[m], m], phi);
    }
