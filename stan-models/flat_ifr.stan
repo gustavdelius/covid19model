@@ -84,7 +84,6 @@ model {
   phi ~ normal(0,5);
   kappa ~ normal(0,0.5);
   mu ~ normal(3.28, kappa); // citation: https://academic.oup.com/jtm/article/27/2/taaa021/5735319
-  alpha ~ gamma(1,2);
   ifr_noise ~ normal(1,0.1);
   log_infecteds_multiplier ~ normal(0, 2);
   for(m in 1:M){
