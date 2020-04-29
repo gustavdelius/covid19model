@@ -72,7 +72,7 @@ N2 <- 100 # increase if you need more forecast
 
 processed_data <- process_covariates(countries = countries, interventions = interventions, 
                                      d = d , ifr.by.country = ifr.by.country, N2 = N2,
-                                     mean2 = 14.8)
+                                     mean2 = 21.8)
 stan_data = processed_data$stan_data
 dates = processed_data$dates
 deaths_by_country = processed_data$deaths_by_country
