@@ -35,4 +35,4 @@ fit = sampling(
 )
 
 save(fit, dates, reported_cases, deaths_by_country, countries, stan_data, 
-     file = paste0('results/',StanModel,'-synthetic-',JOBID,'-stanfit.Rdata'))
+     file = paste0('results/',StanModel,'-synthetic.Rdata'))
