@@ -64,7 +64,7 @@ transformed parameters {
         prediction[1:N0,m] = rep_vector(y[m],N0); // learn the number of cases in the first N0 days
         cumm_sum[2:N0,m] = cumulative_sum(prediction[2:N0,m]);
         
-        Rt[,m] = mu[m] * exp(-X[m] * alpha - X[m][,5] * lockdown[m]);
+        Rt[,m] = R0[m] * exp(-X[m] * alpha - X[m][,5] * lockdown[m]);
         Rt_adj[1:N0,m] = Rt[1:N0,m];
         for (i in (N0+1):N2) {
           real convolution = dot_product(sub_col(prediction, 1, m, i-1), tail(SI_rev, i-1));
@@ -112,7 +112,7 @@ generated quantities {
         for (i in (N0+1):N2) {
           real convolution0 = dot_product(sub_col(prediction0, 1, m, i-1), tail(SI_rev, i-1));
           cumm_sum0[i,m] = cumm_sum0[i-1,m] + prediction0[i-1,m];
-          prediction0[i, m] = ((pop[m]-cumm_sum0[i,m]) / pop[m]) * mu[m] * convolution0;
+          prediction0[i, m] = ((pop[m]-cumm_sum0[i,m]) / pop[m]) * R0[m] * convolution0;
         }
         E_deaths0[1, m]= 1e-15 * prediction0[1,m];
         for (i in 2:N2){
