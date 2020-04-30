@@ -22,7 +22,7 @@ for(m in 1:M){
 
 options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
-StanModel <- "base_ifr"
+StanModel <- "flat_ifr"
 m = stan_model(paste0('stan-models/',StanModel,'.stan'))
 fit = sampling(
   m,
