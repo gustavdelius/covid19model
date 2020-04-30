@@ -33,3 +33,6 @@ fit = sampling(
   thin = 1,
   control = list(adapt_delta = 0.95, max_treedepth = 15)
 )
+
+save(fit, dates, reported_cases, deaths_by_country, countries, stan_data, 
+     file = paste0('results/',StanModel,'-synthetic-',JOBID,'-stanfit.Rdata'))
