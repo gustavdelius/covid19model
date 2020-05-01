@@ -30,7 +30,7 @@ transformed data {
 
 parameters {
   real<lower=0> mu[M]; // intercept for Rt
-  vector<lower=0, upper = 1.2>[P] alpha; 
+  vector<lower=0, upper = 1.6>[P] alpha; 
   real<lower=0> gamma;
   vector[M] lockdown;
   real<lower=0> kappa;
