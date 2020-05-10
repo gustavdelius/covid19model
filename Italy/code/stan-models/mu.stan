@@ -30,7 +30,7 @@ transformed data {
 
 
 parameters {
-  real<lower=0> R0[M]; 
+  real<lower=0> mu[M]; 
   vector[P] alpha; 
   vector[P_partial] alpha_state[M];
   real<lower=0> gamma;
@@ -39,7 +39,7 @@ parameters {
   real<lower=0> phi;
   real<lower=0> tau_unit;
   vector<lower=0>[M] ifr_noise;
-  real mu;
+  real ifr_mu;
 }
 
 transformed parameters {
@@ -48,10 +48,10 @@ transformed parameters {
     matrix[N2, M] Rt = rep_matrix(0,N2,M);
     matrix[N2, M] Rt_adj = Rt;
     // The IFR calculated by Imperial group will be multiplied by the random ifr_factor
-    vector<lower = 0>[M] ifr_factor = ifr_noise * exp(mu); 
+    vector<lower = 0>[M] ifr_factor = ifr_noise * exp(ifr_mu); 
     // Number of initial infecteds should also be multiplied by infectes_multiplier,
     // hence tau ~ exponential(0.03) * infecteds_multiplier
-    real<lower = 0> tau = tau_unit / 0.03 / exp(mu); 
+    real<lower = 0> tau = tau_unit / 0.03 / exp(ifr_mu); 
     
     {
       matrix[N2,M] cumm_sum = rep_matrix(0,N2,M);
@@ -59,7 +59,7 @@ transformed parameters {
         prediction[1:N0,m] = rep_vector(y[m],N0); // learn the number of cases in the first N0 days
         cumm_sum[2:N0,m] = cumulative_sum(prediction[2:N0,m]);
         
-        Rt[,m] = R0[m] * 2 * inv_logit(-X[m] * alpha - X_partial[m] * alpha_state[m]);
+        Rt[,m] = mu[m] * 2 * inv_logit(-X[m] * alpha - X_partial[m] * alpha_state[m]);
         Rt_adj[1:N0,m] = Rt[1:N0,m];
         
         for (i in (N0+1):N2) {
@@ -86,10 +86,10 @@ model {
   }
   phi ~ normal(0,5);
   kappa ~ normal(0,0.5);
-  R0 ~ normal(3.28, kappa); // citation: https://academic.oup.com/jtm/article/27/2/taaa021/5735319
+  mu ~ normal(3.28, kappa); // citation: https://academic.oup.com/jtm/article/27/2/taaa021/5735319
   alpha ~ normal(0,0.5);
   ifr_noise ~ normal(1,0.1);
-  mu ~ normal(0, 2);
+  ifr_mu ~ normal(0, 1);
 
   for(m in 1:M){
     deaths[EpidemicStart[m]:N[m], m] ~ neg_binomial_2(E_deaths[EpidemicStart[m]:N[m], m], phi);
