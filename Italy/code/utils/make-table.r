@@ -38,6 +38,8 @@ make_table <- function(filename, date_till_percentage){
   fraction_obs_infected <- vector("list", length = length(regions))
   fraction_total_obs_infected <- vector("list", length = length(regions))
   y <- vector("list", length = length(regions))
+  current_cases <- array(dim = dim(estimated_cases_raw)[c(1,3)])
+  weighted_fraction <- current_cases
   
   for(i in 1:length(regions)) {
     Country = regions[i]
@@ -57,8 +59,8 @@ make_table <- function(filename, date_till_percentage){
     total_cases_li[[i]] = c(
       round((colQuantiles(rowCumsums(estimated_cases_raw[,1:length(x),i]),probs=.025))))
     total_cases_ui[[i]] = c(
-      round((colQuantiles(rowCumsums(estimated_cases_raw[,1:length(x),i]),probs=.975))))
-    
+      round((colQuantiles(rowCumsums(estimated_cases_raw[,1:length(x),i]),probs=.975))))   
+
     deaths[[i]] =  c(rep(0, padding), round(colMeans(estimated_deaths_raw[,1:length(x),i])))
     total_deaths[[i]] =  c(rep(0, padding), round(cumsum(colMeans(estimated_deaths_raw[,1:length(x),i]))))
     rt[[i]] = c(rep(NA, padding), colMeans(out$Rt_adj[,1:length(x),i]))
@@ -72,7 +74,18 @@ make_table <- function(filename, date_till_percentage){
     fraction_total_obs_infected[[i]] = c(rep(0, padding), cumsum(y[[i]]) / cases[[i]])
     
     total_cases[[i]]  = c(rep(0, padding),total_cases[[i]])
+    
+    ## For immunity calculation
+    dtp <- which(x == date_till_percentage)
+    current_cases[, i] <- estimated_cases_raw[,dtp,i]
+    weighted_fraction[, i] <- estimated_cases_raw[,dtp,i] *
+      rowSums(estimated_cases_raw[,1:dtp,i]) / ifrs$popt[ifrs$country==Country]
   }
+  
+  
+  ## For immunity calculation
+  attack <- rowSums(weighted_fraction) / rowSums(current)
+
   
   dates_italy  = c(dates_italy,dates_italy[length(dates_italy)]+1:forecast)
   cases <- do.call(rbind, cases)
