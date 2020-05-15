@@ -161,15 +161,18 @@ if (FULL){
   # Can make plots = TRUE if you want to see 3 panel plots for simulations and rt_plots
   simulate_scenarios(JOBID = JOBID,  StanModel, plots = TRUE, scenario_type = "increase-mob-current", len_forecast = len_forecast,
                      subdir='Italy',
-                     simulate_code='Italy/code/stan-models/simulate.stan', mobility_vars=c(1,2,3), 
+                     simulate_code=paste0('Italy/code/stan-models/', StanModel, '-simulate.stan'), 
+                     mobility_vars=c(1,2,3), 
                      mobility_increase = 40)
   simulate_scenarios(JOBID = JOBID,  StanModel, plots = TRUE, scenario_type = "increase-mob-current", len_forecast = len_forecast,
                      subdir='Italy',
-                     simulate_code='Italy/code/stan-models/simulate.stan', mobility_vars=c(1,2,3), 
+                     simulate_code=paste0('Italy/code/stan-models/', StanModel, '-simulate.stan'), 
+                     mobility_vars=c(1,2,3), 
                      mobility_increase = 20)
   simulate_scenarios(JOBID = JOBID,  StanModel, plots = TRUE, scenario_type = "constant-mob", len_forecast = len_forecast,
                      subdir='Italy',
-                     simulate_code='Italy/code/stan-models/simulate.stan', mobility_vars=c(1,2,3), 
+                     simulate_code=paste0('Italy/code/stan-models/simulate.stan'), 
+                     mobility_vars=c(1,2,3), 
                      mobility_increase = 0)
   
   source("Italy/code/utils/make-table.r")
