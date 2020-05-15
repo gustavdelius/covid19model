@@ -82,7 +82,7 @@ model {
   kappa ~ normal(0,0.5);
   mu ~ normal(3.28, kappa); // citation: https://academic.oup.com/jtm/article/27/2/taaa021/5735319
   alpha_hier ~ gamma(.1667,1);
-  ifr_noise ~ normal(3,0.3);
+  ifr_noise ~ normal(1.0/3,0.1/3);
   for(m in 1:M){
     deaths[EpidemicStart[m]:N[m], m] ~ neg_binomial_2(E_deaths[EpidemicStart[m]:N[m], m], phi);
    }
