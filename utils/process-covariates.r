@@ -59,6 +59,7 @@ process_covariates <- function(countries, interventions, d, ifr.by.country, N2,
       
      region <- bind_rows(padded_data,region)
     }
+    region$Deaths[region$Deaths < 0] <- 0
     index = which(region$Cases>0)[1]
     index1 = which(cumsum(region$Deaths)>=10)[1] # also 5
     index2 = index1-30
@@ -129,5 +130,6 @@ process_covariates <- function(countries, interventions, d, ifr.by.country, N2,
   for (i in 1:stan_data$M){
     stan_data$X[i,,] = covariate_list[[i]] 
   }
+  
   return(list("stan_data" = stan_data, "dates" = dates, "reported_cases"=reported_cases, "deaths_by_country" = deaths_by_country))
 }
